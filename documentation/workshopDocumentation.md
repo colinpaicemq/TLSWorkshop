@@ -19,12 +19,12 @@ This has been tested on Ubuntu Linux 22.40, and should work on other environment
 ## Execution environment
 I created and used a directory ~/tmp/tls.
 
-I wexecuted the commands like 
+I executed the commands like 
 ```
 sh    ~/git/TLSWorkshop/files/s_client.sh 
 
 ``` 
-and it stored the certificates etc in the current directory (~tmp/tls).
+and it stored the certificates etc in the current directory (~/tmp/tls).
 
 
 ## Create a self signed certificate
@@ -57,7 +57,7 @@ Someof of the key lines are
 - keyUsage             = critical, keyEncipherment
 - extendedKeyUsage      = critical, serverAuth
 
-This says the certificate can be used for encrypting keys.  The server can the certificate, but a client cannot use it 
+This says the certificate can be used for encrypting keys.  The server can the certificate, but a client cannot use it. 
 
 ## Use the certificate as a server
 ### server.sh 
@@ -149,12 +149,12 @@ The server reports
 ```
 
 The 
-
+```
 verify error:num=26:unsupported certificate purpose
+```
+is because the certifcate needs Extended Key Usage (EKU) with clientAuth. EKU of clientAuth needs Key Usage (KU) of Digitalsignature.  See [here](https://superuser.com/questions/738612/openssl-ca-keyusage-extension).
 
-is because the certifcate needs Extended Key Usage (EKU) with clientAuth. EKU of clientAuth needs Key Usage (KU) of Digitalsignature.  See https://superuser.com/questions/738612/openssl-ca-keyusage-extension
-
-Change the certificate and validate it.
+Change genss.config, to add the client support. Run the script and rerun the s_client certificate and validate it.
 
 ## Create a Certificate Authority
 The important part of the script is
@@ -173,7 +173,6 @@ This
 - generates a private key with EC curve with the type prime26v1
 - creates a (self signed) certificate 
 - create the files with the file name caEC256
-- The CA expires in 6 days  (see the genca.sh script)
 
 ## Generate the signed server certificate
 
@@ -183,8 +182,7 @@ Execute the script.  Check the information
 
 - what type is it?
 - what is the subject?
-- what is the expiry dat
-- e range?
+- what is the expiry date range?
 - does it have an issuer? if not why not?
 - what sort of public key is it, and what key size?
 
@@ -216,9 +214,6 @@ Execute the script.
 
 As a Certificate Authority person, you need to check the information in the request.
 If you are happy with the information reply Y to the prompt. 
-You should not have replied Y...  edit the script and fix the problem.
-
-Rerun the script
 
 Check the information in the certificate, such as issuer, subject, what it can be used for,
 
@@ -272,7 +267,7 @@ This is because the top level of the chain is self signed (as expected)
 
 Review the certificate chain.
 
-Ignore the certificate
+Ignore the BEGIN CERTIFICATE ... END CERTIFICATE
 
 ```
 Acceptable client certificate CA names
@@ -283,11 +278,27 @@ Client Certificate Types: RSA sign, DSA sign, ECDSA sign
 The server has sent down the list of the CA certificates in its trust store.
 The server will accept certificates signed by the CA, and of type RSA, EC, ECDSA
 
+Cancel the client program, leave the server running.
+
 ## Run a curl request into the server.
 
 ```
 curl --cacert ./caEC256.pem --cert clientEC384.pem --key clientEC384.key.pem -v   https://localhost:4433
 ```
+## Use a web server to access the openssl server.
+
+This section does not work yet...
+Use a web browser (chrome) with a URL of https://localhost:4433 .
+
+This will fail with NET::ERR_CERT_AUTHORITY_INVALID.   This is because the browser does not have the CA in its store.
+
+Import the CA certificate caEC256.p12 into the "managing certificates " Authority section.  It will appear as Org-DOC (as per the -subj name)
+
+Import the client certificate clientEC384.p12 into the "Your certificates".
+
+Stop  and restart the browser.
+
+Try the URL again.
 
 
 # Extending the server and client certificate

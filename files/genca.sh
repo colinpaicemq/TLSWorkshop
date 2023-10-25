@@ -16,4 +16,9 @@ openssl req -x509 -sha384  $key $keyform -nodes $casubj $out $outform $days
 # print it
 openssl x509 -in $CA.pem -text -noout|less
 
+password=" -passin file:$BASEDIR/password.file -passout  file:$BASEDIR/password.file"
+
+openssl pkcs12 -export -inkey $CA.key.pem -in $CA.pem -out $CA.p12 $password
+
+
 
