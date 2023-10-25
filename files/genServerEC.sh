@@ -1,3 +1,5 @@
+#!/bin/bash  -x 
+BASEDIR=$(dirname "$0")
 
 timeout="--connect-timeout 10"
 enddate="-enddate 20291026164600Z" 
@@ -15,8 +17,8 @@ rm $name.pem
 
 subj="-subj /C=GB/O=Doc/CN=EC-SERVER" 
 
-passin="-passin file:password.file"
-passout="-passout file:password.file"
+passin="-passin file:$BASEDIR/password.file "
+passout="-passout file:$BASEDIR/password.file "
 
 #md="-md sha384"
 
@@ -28,7 +30,7 @@ extensions=""
 
 extensions="-reqexts  server"
 
-config="-config client.config"
+config="-config $BASEDIR/client.config"
 #config=""
 
 

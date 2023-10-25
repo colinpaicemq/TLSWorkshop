@@ -1,3 +1,7 @@
+#!/bin/bash  -x 
+BASEDIR=$(dirname "$0")
+
+
 index="-index ./index.txt"
 port="-port 9999"
 rsigner="-rsigner OCSP.pem"

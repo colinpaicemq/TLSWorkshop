@@ -11,8 +11,22 @@ It does the following
 
 It should provide all of the files you need.
 
+You should repeat running the tests over a few days. The runs may not always work because one of the certificate expires after 1 day!  You'll need to fix it.  This will give you some experience  in debugging TLS problems.
+
 # Environment
 This has been tested on Ubuntu Linux 22.40, and should work on other environments where openssl is supported.
+
+## Execution environment
+I created and used a directory ~/tmp/tls.
+
+I wexecuted the commands like 
+```
+sh    ~/git/TLSWorkshop/files/s_client.sh 
+
+``` 
+and it stored the certificates etc in the current directory (~tmp/tls).
+
+
 ## Create a self signed certificate
 ### genss.sh
 Review the genss.sh script.  The key line is
@@ -169,7 +183,8 @@ Execute the script.  Check the information
 
 - what type is it?
 - what is the subject?
-- what is the expiry date range?
+- what is the expiry dat
+- e range?
 - does it have an issuer? if not why not?
 - what sort of public key is it, and what key size?
 
@@ -234,13 +249,15 @@ This
 
 Check the information in the certificate, for example the issuer, the validity dates, and the subject.
 
+The command openssl pkcs12... is used to create a .p12 file which can be imported and used by a web browser.
+
 ## Run the signed certificate scenario
 
 Stop any other server you have running.
 
 Review and run sh ca_server.sh 
 
-Review and run the client sh ca_s_client.sh in a different  
+Review and run the client sh ca_s_client.sh in a different window.  
 
 In the output it has
 
@@ -266,10 +283,11 @@ Client Certificate Types: RSA sign, DSA sign, ECDSA sign
 The server has sent down the list of the CA certificates in its trust store.
 The server will accept certificates signed by the CA, and of type RSA, EC, ECDSA
 
-## Fix the date problem
+## Run a curl request into the server.
 
-Edit to make the date next year's date,  and run the script to generate the server certificate. 
-Rerun the scenario and check this solves the problem.
+```
+curl --cacert ./caEC256.pem --cert clientEC384.pem --key clientEC384.key.pem -v   https://localhost:4433
+```
 
 
 # Extending the server and client certificate
@@ -324,7 +342,7 @@ erment, dataEncipherment
 subjectAltName         = DNS:localhost, IP:222.0.0.1
 
 extendedKeyUsage       = serverAuth, OCSPSigning 
-
+q
 subjectKeyIdentifier   = hash
 nsComment  = "server"
 
@@ -350,26 +368,53 @@ sh runOCSP.sh
 #### Verify Certificate Revocation. 
 Switch to a new terminal and run
  
-    openssl ocsp -CAfile rootCA.crt -issuer rootCA.crt -cert certificate.crt -url http://127.0.0.1:8080 -resp_text -noverify
+```
+sh checkOCSP.sh
+```
 
 This will show that the certificate status is good.
+```
+serverec.pem: good
+	This Update: Oct 24 16:55:02 2023 GMT
 
-Revoke a certificate
+```
 
-    If you want to revoke the certificate run following command
+## Revoke a certificate
 
-openssl ca -keyfile rootCA.key -cert rootCA.crt -revoke certificate.crt
+### Revoke the certificate
+If you want to revoke the certificate run following command
 
-2. Then restart the OCSP server.
+```
+sh revokeServerEC.sh
+```
 
-openssl ocsp -index demoCA/index.txt -port 8080 -rsigner ocspSigning.crt -rkey ocspSigning.key -CA rootCA.crt -text -out log.txt &
+It returns something like
+```
+Revoking Certificate 24D14101D144B0AC65EDDB089F23AAEAC3B8C036.
+Data Base Updated
 
-3. Verify Certificate Revocation. Switch to a new terminal and run
+```
 
-openssl ocsp -CAfile rootCA.crt -issuer rootCA.crt -cert certificate.crt -url http://127.0.0.1:8080 -resp_text -noverify
+### Restart the OCSP server.
 
-This will show that the certificate status as revoked.s
+Cancel the  OCSP server and restart it
+
+### Check the certificate again
+
+```
+sh checkOCSP.sh
+```
+
+This will show that the certificate status is revoked.
+```
+-----END CERTIFICATE-----
+serverec.pem: revoked
+	This Update: Oct 24 17:04:27 2023 GMT
+	Revocation Time: Oct 24 17:00:28 2023 GMT
 
 
+```
 
-https://github.com/xperseguers/ocsp-responder/blob/master/Documentation/CertificateAuthority.md
+#Useful document
+
+[This](https://github.com/xperseguers/ocsp-responder/blob/master/Documentation/CertificateAuthority.md ) is a good document.

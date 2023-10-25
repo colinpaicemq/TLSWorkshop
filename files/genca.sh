@@ -1,3 +1,6 @@
+#!/bin/bash  -x 
+BASEDIR=$(dirname "$0")
+
 CA="caEC256"
 casubj=" -subj /C=GB/O=DOC/OU=CA/CN=SSCA256"
 days="-days 600"

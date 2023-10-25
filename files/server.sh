@@ -1,3 +1,7 @@
+#!/bin/bash  -x 
+BASEDIR=$(dirname "$0")
+
+
 
 #tls="-tls1_3 -no_tls1_2 -no_tls1_1 -no_ssl3 "
 #tls="-tls1_2 -no_tls1_3 -no_tls1_1"
@@ -23,7 +27,7 @@ debug=" "
 msg="-msg"
 msg=""
 verify="-verify 0"
-pass="-pass file:password.file" 
+pass="-pass file:$BASEDIR/password.file " 
 
 
 openssl s_server $port $tls  $cert $cipher $verify  $CA $debug $strict $pass -www  

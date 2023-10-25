@@ -1,6 +1,9 @@
+#!/bin/bash  -x 
+BASEDIR=$(dirname "$0")
 
 timeout="--connect-timeout 10"
 enddate="-enddate 20240130164600Z" 
+enddate="-days 1"
 
 ext="-extensions end_user"
 
@@ -16,23 +19,24 @@ cafiles="-cert $CA.pem -keyfile $CA.key.pem "
 rm $name.key.pem
 rm $name.csr
 rm $name.pem
-passin="-passin file:password.file"
-passout="-passout file:password.file"
+
+password=" -passin file:$BASEDIR/password.file -passout  file:$BASEDIR/password.file"
 md="-md sha384"
 policy="-policy signing_policy"
-caconfig="-config ca.config"
+caconfig="-config $BASEDIR/ca.config"
 caextensions="-extensions client"
-config="-config client.config"
+config="-config $BASEDIR/client.config"
 config=""
+serial="-rand_serial"
 
 
 openssl ecparam -name  secp384r1 -genkey -noout -out $name.key.pem 
-openssl req $config -new -key $key -out $name.csr -outform PEM -$subj $passin $passout
-openssl ca $caconfig $policy $ext $md $cafiles -out $cert -in $name.csr $enddate $caextensions 
+openssl req $config -new -key $key -out $name.csr -outform PEM -$subj $password
+openssl ca $caconfig $policy $ext $md $cafiles -out $cert -in $name.csr $enddate $caextensions $serial
 
 openssl x509 -in $name.pem -text -noout
 
-openssl pkcs12 -export -inkey $name.key.pem -in $name.pem -out $name.p12 -CAfile $CA.pem -chain -name $name -passout file:password.file -passin file:password.file
+openssl pkcs12 -export -inkey $name.key.pem -in $name.pem -out $name.p12 -CAfile $CA.pem -chain -name $name $password
 
 #openssl ecparam -name  secp256r1  -genkey -noout -out $name.key.pem 
 #openssl req -config eccert.config -new -key $name.key.pem -out $name.csr -outform PEM -subj "/C=GB/O=cpwebuser/CN="$name   -passin file:password.file -passout file:password.file

@@ -1,3 +1,6 @@
+#!/bin/bash  -x 
+BASEDIR=$(dirname "$0")
+
 
 tls="-tls1_3 -no_tls1_2 -no_tls1_1"
 tls="-tls1_2 -no_tls1_3 -no_tls1_1"
@@ -12,7 +15,7 @@ ca="-CAfile ./doczosca.pem "
 ca="-CAfile ./zpdt.ca.pem "
 ca=""
 tls=""
-pass="-pass file:password.file" 
+pass="-pass file:$BASEDIR/password.file " 
 debug="-debug"
 debug=""
 msg="-msg"

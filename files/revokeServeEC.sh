@@ -22,9 +22,9 @@ policy="-policy signing_policy"
 caextensions="-extensions server"
 config="-config $BASEDIR/ca.config"
 
-openssl ca $config $policy $ext $md $cafiles -out $cert -in $name.csr $enddate $caextensions  $serial
-
-openssl x509  -in $name.pem  -noout -text
+#openssl ca $config $policy $ext $md $cafiles -out $cert -in $name.csr $enddate $caextensions  $serial
+openssl ca $config  $cafiles   -revoke $cert  
+# openssl x509  -in $name.pem  -noout -text
 
  
  

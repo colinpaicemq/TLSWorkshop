@@ -1,19 +1,21 @@
 #!/bin/bash  -x 
+BASEDIR=$(dirname "$0")
 
 name="ss"
 rm $name.*
 
+
 #create it
 # openssl req -x509  -sha256 -utf8 -days 365 -nodes      !outform pem -subj 
 key="-newkey rsa:2048 "
-config="-config genss.config"
+config="-config $BASEDIR/genss.config"
 
 subj="-subj "/C=GB/O=SS/CN="$name"  
 
 out="-out $name.pem "
 keyout="-keyout $name.key.pem "
 ext="-extensions ss_extensions"
-password=" -passin file:password.file -passout  file:password.file"
+password=" -passin file:$BASEDIR/password.file -passout  file:$BASEDIR/password.file"
 
 openssl req -x509 $config  $key $out $keyout  $subj $ext  $password
 
