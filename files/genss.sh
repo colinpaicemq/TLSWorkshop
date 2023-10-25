@@ -43,7 +43,7 @@ openssl pkcs12 -export -in $name.pem -inkey $name.key.pem   -out $name.p12  -nam
 
 
 
-# keyUsage               = keyCertSign, cRLSigndigitalSignature, nonRepudiation, keyEncipherment, dataEncipherment, keyAgreement
+# keyUsage               = cRLSigndigitalSignature, nonRepudiation, keyEncipherment, dataEncipherment, keyAgreement
 # extendedKeyUsage      =  serverAuth,clientAuth
 
 

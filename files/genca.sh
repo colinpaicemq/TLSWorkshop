@@ -10,9 +10,14 @@ outform="-outform PEM"
 keyform="-keyform pem"
 key="-key $CA.key.pem "
 
+config="-config $BASEDIR/ca.config"
+extensions="-extensions genCA"
+
+
 openssl ecparam -name prime256v1 -genkey -noout -out $CA.key.pem
 #generate the certificate
-openssl req -x509 -sha384  $key $keyform -nodes $casubj $out $outform $days
+#openssl req -x509 -sha384  $key $keyform -nodes $casubj $out $outform $days 
+openssl req -x509 -sha384  $key $keyform -nodes $casubj $out $outform $days $config $extensions
 # print it
 openssl x509 -in $CA.pem -text -noout|less
 
